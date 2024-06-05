@@ -1,8 +1,5 @@
-﻿using System;
-using System.Reflection;
-using System.Runtime.Versioning;
+﻿using APIContagem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 
 namespace APIContagem.Controllers
 {
@@ -10,28 +7,16 @@ namespace APIContagem.Controllers
     [Route("[controller]")]
     public class ContadorController : ControllerBase
     {
-        private static Contador _CONTADOR = new Contador();
+        private readonly IContadorService service;
+        public ContadorController(IContadorService _service)
+        {
+            this.service = _service;
+        }
 
         [HttpGet]
-        public object Get([FromServices]IConfiguration configuration)
+        public object Get()
         {
-            lock (_CONTADOR)
-            {
-                _CONTADOR.Incrementar();
-
-                return new
-                {
-                    _CONTADOR.ValorAtual,
-                    Environment.MachineName,
-                    Local = "Teste",
-                    Sistema = Environment.OSVersion.VersionString,
-                    Variavel = configuration["TesteAmbiente"],
-                    TargetFramework = Assembly
-                        .GetEntryAssembly()?
-                        .GetCustomAttribute<TargetFrameworkAttribute>()?
-                        .FrameworkName
-                };
-            }
+            return this.service.Get();
         }
     }
 }
